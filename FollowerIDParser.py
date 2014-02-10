@@ -60,11 +60,14 @@ def get_all_followers_id(id, name, max_page=999999999):
     
     page_count = 0
     next_page = generate_follower_first_page(id)
+    print next_page
+    
+    last_page_followers_count = 0
     while True:
         if page_count > max_page:
             break
         
-        print commentator_id_to_name[id], next_page, time.clock()
+        print commentator_id_to_name[id], next_page, time.clock(), last_page_followers_count
         
         follwers, have_except = get_one_page_follwers_id(next_page)
         next_page = generate_follower_next_page(next_page)
@@ -72,22 +75,25 @@ def get_all_followers_id(id, name, max_page=999999999):
         # if timeout, we need to continue read next pages
         if have_except == True:
             continue
-        
-        if follwers == None:
+        elif len(follwers) == 0:
             break
             
         for follwer in follwers:
             file_handle.write("%s\n"%follwer)
         
+        last_page_followers_count = len(follwers)
+        
         page_count += 1
+        file_handle.flush()
         
     file_handle.close()
     
 def get_commentator_followers():
-    max_page = 999999999
+    max_page = 9999999
     create_temp_data_dir()
     for (id, name) in commentator_id_to_name.items():
         get_all_followers_id(id, name, max_page)
     
 if __name__ == "__main__":
     get_commentator_followers()
+    #print get_one_page_follwers_id("http://i.youku.com/u/UNDM0NTE0MzMy/followers/page_1 ")
