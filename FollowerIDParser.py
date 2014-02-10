@@ -55,7 +55,7 @@ def get_one_page_follwers_id(page_url):
     return (follwers, False)
 
 # max_page for debug
-def get_all_followers_id(id, name, max_page=999999999):
+def get_all_followers_id(id, name, max_page=MAXINT):
     file_handle = open("%s/%s_%s" % (temp_data_store_dir, name, id), "w")
     
     page_count = 0
@@ -89,11 +89,10 @@ def get_all_followers_id(id, name, max_page=999999999):
     file_handle.close()
     
 def get_commentator_followers():
-    max_page = 9999999
+    max_page = MAXINT
     create_temp_data_dir()
     for (id, name) in commentator_id_to_name.items():
         get_all_followers_id(id, name, max_page)
     
 if __name__ == "__main__":
     get_commentator_followers()
-    #print get_one_page_follwers_id("http://i.youku.com/u/UNDM0NTE0MzMy/followers/page_1 ")

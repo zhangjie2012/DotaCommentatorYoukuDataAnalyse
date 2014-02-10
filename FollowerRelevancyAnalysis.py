@@ -2,6 +2,15 @@
 # -*- coding: UTF-8 -*-
 
 from GlobalParam import *
+from GetMinFollowersCount import *
+import networkx as nx
+import matplotlib.pyplot as plt
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+from matplotlib import rc
+rc('font',**{'family':'sans-serif','sans-serif':['Microsoft YaHei']})
 
 class RelevancyAtom:
     def __init__(self, id, count):
@@ -10,13 +19,13 @@ class RelevancyAtom:
         self.percent = 0.0
         
 class Commentator:
-    def __init__(self, id, name):
+    def __init__(self, id, name, analyse_followers_count):
         self.id = id
         
         # init followers id from file
         self.followers_id = set()
         file_path = self.__get_follower_data_file_path(id, name)
-        self.__get_follower_from_file(file_path)
+        self.__get_follower_from_file(file_path, analyse_followers_count)
         
         self.relevancy_list = []
         
@@ -34,15 +43,26 @@ class Commentator:
     def sort_relevancy_by_percent(self):
         self.relevancy_list.sort(key=lambda rel_atom : rel_atom.percent, reverse = True)
         
-    def debug_output(self):
-        print "\n%s followers: %d" % (commentator_id_to_name[self.id], len(self.followers_id))
-        for rel_atom in self.relevancy_list:
-            print "\t-> %15s %10s %.2f%%" % (commentator_id_to_name[rel_atom.other_id], rel_atom.same_followers_count, rel_atom.percent*100)
+    def get_index(self, id):
+        index = 1
+        for rl in self.relevancy_list:
+            if rl.other_id == id:
+                break
+            index += 1
+        return index
         
-    def __get_follower_from_file(self, file_path):
+    def debug_output(self):
+        print "\nName: %s TotalAnalyseFollowers: %d" % (commentator_id_to_name[self.id], len(self.followers_id))
+        for rel_atom in self.relevancy_list:
+            print "\t-> %15s %10s %10.2f%%" % (commentator_id_to_name[rel_atom.other_id], rel_atom.same_followers_count, rel_atom.percent*100)
+        
+    def __get_follower_from_file(self, file_path, analyse_followers_count):
         file_handle = open(file_path, "r")
         
         while True:
+            if analyse_followers_count == 0:
+                break
+                
             line = file_handle.readline()
             if not line:
                 break
@@ -50,6 +70,8 @@ class Commentator:
             line = line.strip()
             if len(line) != 0:
                 self.followers_id.add(line)
+            
+            analyse_followers_count -= 1
             
         file_handle.close()
         
@@ -66,13 +88,162 @@ def cal_follower_relevancy(commentators):
         
         commentators[i].cal_other_id_followers_percent()
         commentators[i].sort_relevancy_by_percent()
-        
-if __name__ == "__main__":
+
+def gen_commentators_from_file():
+    analyse_followers_count = get_min_follower_count()
+    
     commentators = []
     for (id, name)  in commentator_id_to_name.items():
-        commentators.append(Commentator(id, name))
+        commentators.append(Commentator(id, name, analyse_followers_count))
     
     cal_follower_relevancy(commentators)
-    for com in commentators:
-        com.debug_output()
+    
+    return commentators
+    
+class RelevancyNode():
+    def __init__(self, first_name, second_name, weight):
+        self.first_name = first_name
+        self.second_name = second_name
+        self.weight = weight
+        
+class RelevancyGraph():
+    def __init__(self):
+        self.very_strong = []
+        self.strong = []
+        self.normal = []
+        self.weak = []
+        
+    # first_loc: second_name in first_name's relevancy_list's index
+    # second_loc: first_name in second_name's relevancy_list's index 
+    # predicate relevancy:
+    #   weight in 
+    #       [2 ~4) -> very strong
+    #       [4 ~ 11) -> strong
+    #       [11 ~ 21) -> normal
+    #       [21 ~ ) -> weak
+    def insert_node(self, first_name, second_name, first_loc, second_loc):
+        weight = first_loc + second_loc
+        
+        if weight < 4:
+            self.very_strong.append(RelevancyNode(first_name, second_name, weight))
+        elif weight < 7:
+            self.strong.append(RelevancyNode(first_name, second_name, weight))
+        elif weight < 11:
+            self.normal.append(RelevancyNode(first_name, second_name, weight))
+        else:
+            self.weak.append(RelevancyNode(first_name, second_name, weight))
+    
+    def to_chinese(self):
+        for rel in self.very_strong:
+            rel.first_name = self.__translate(rel.first_name)
+            rel.second_name = self.__translate(rel.second_name)
+        for rel in self.strong:
+            rel.first_name = self.__translate(rel.first_name)
+            rel.second_name = self.__translate(rel.second_name)
+        for rel in self.normal:
+            rel.first_name = self.__translate(rel.first_name)
+            rel.second_name = self.__translate(rel.second_name)
+        for rel in self.weak:
+            rel.first_name = self.__translate(rel.first_name)
+            rel.second_name = self.__translate(rel.second_name)
+            
+    def __translate(self, name):
+        if name == "2009":
+            return u"酒神"
+        elif name == "HaiTao":
+            return u"海涛"
+        elif name == "ManLouShuiPing":
+            return u"满楼"
+        elif name == "XiaoMan":
+            return u"小满"
+        elif name == "NiuWa":
+            return u"蛙导"
+        elif name == "LaoShu_SJQ":
+            return u"老鼠"
+        elif name == "KuangShi":
+            return u"狂湿"
+        elif name == "Ks_ChenBin":
+            return u"Ks陈彬"
+        elif name == "TuFu_AChuan":
+            return u"阿川"
+        elif name == "Pc_LengLeng":
+            return u"冷冷"
+        elif name == "Pis":
+            return u"P神"
+        elif name == "MeiXi_Huang":
+            return u"梅西"
+        elif name == "Kevin":
+            return u"凯文"
+        elif name == "XiaoGuai":
+            return u"乖神"
+        elif name == "QingShu":
+            return u"情书"
+        else:
+            return name
+        
+    def debug_output(self):
+        print "very_strong:"
+        for rel in self.very_strong:
+            print "\t", rel.first_name, rel.second_name, rel.weight
+            
+        print "strong:"
+        for rel in self.strong:
+            print "\t", rel.first_name, rel.second_name, rel.weight
+            
+        print "normal:"
+        for rel in self.normal:
+            print "\t", rel.first_name, rel.second_name, rel.weight
+        
+        print "weak:"
+        for rel in self.weak:
+            print "\t", rel.first_name, rel.second_name, rel.weight
+    
+def draw_topology(rel_graph):
+    rel_graph.to_chinese()
+    
+    G = nx.Graph()
+    # add edge
+    e_very_strong = []
+    e_strong = []
+    e_normal = []
+    print len(rel_graph.very_strong)
+    for rel in rel_graph.very_strong:
+        G.add_edge(rel.first_name, rel.second_name, weight=rel.weight)
+        e_very_strong.append((rel.first_name, rel.second_name))
+    for rel in rel_graph.strong:
+        G.add_edge(rel.first_name, rel.second_name, weight=rel.weight)
+        e_strong.append((rel.first_name, rel.second_name))
+        
+    for rel in rel_graph.normal:
+        G.add_edge(rel.first_name, rel.second_name, weight=rel.weight)
+        e_normal.append((rel.first_name, rel.second_name))
+        
+    # positions for all nodes
+    pos = nx.spring_layout(G)
+    
+    nx.draw_networkx_nodes(G, pos, alpha=0.1, color='b',node_size=1500)
+    nx.draw_networkx_edges(G,pos,edgelist=e_very_strong, edge_color='r', width=2)
+    nx.draw_networkx_edges(G,pos,edgelist=e_strong, edge_color='b', width=2)
+    nx.draw_networkx_edges(G,pos,edgelist=e_normal, edge_color='gray', width=1)
+    nx.draw_networkx_labels(G,pos,font_size=12,font_family='sans-serif')
+    
+    plt.axis('off')
+    plt.show() # display
+    
+def main():
+    commentators = gen_commentators_from_file()
+    # for com in commentators:
+        # com.debug_output()
+    
+    rel_graph = RelevancyGraph()
+    
+    for i in range(0, len(commentators)):
+        for j in range(i+1, len(commentators)):
+            rel_graph.insert_node(commentator_id_to_name[commentators[i].id], commentator_id_to_name[commentators[j].id],
+                commentators[i].get_index(commentators[j].id), commentators[j].get_index(commentators[i].id))
+    rel_graph.debug_output()
+    draw_topology(rel_graph)
+    
+if __name__ == "__main__":
+   main()
     

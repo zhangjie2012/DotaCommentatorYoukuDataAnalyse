@@ -24,3 +24,4 @@ commentator_id_to_name = {
 
 youku_base_url = "http://i.youku.com/u/"
 temp_data_store_dir = "TempData"
+MAXINT = 9999999999999

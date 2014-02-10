@@ -6,6 +6,11 @@
 
 TempData 目录中为一些测试数据(每个解说的前20页粉丝)，
 
+## 依赖库 ##
+
++ [NumPy](http://www.numpy.org/)
++ [matplotlib](http://matplotlib.org/)
+
 ## 测试方法 ##
 
 `python FollowerRelevancyAnalysis.py`
