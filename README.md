@@ -1,36 +1,20 @@
-# DotaÖªÃû½âËµÔÚÓÅ¿áÊý¾Ý·ÖÎö #
+# ä¼˜é…·Dotaè§£è¯´ç²‰ä¸é‡åˆåº¦åˆ†æž #
 
-## ¼ò½é ##
+## å£°æ˜Ž ##
 
-ÏîÄ¿Ä¿Ç°´¦ÓÚ¿ª·¢¹ý³ÌÖÐ ...
+æœ¬é¡¹ç›®ç”¨æ¥åˆ†æžâ€œä¼˜é…·Dotaè§£è¯´ç²‰ä¸é‡åˆåº¦â€ï¼Œä»…ä¾›ä¸ªäººå¨±ä¹ç ”ç©¶ï¼Œåˆ‡å‹¿ç”¨äºŽå…¶ä»–ç”¨é€”ï¼Œæ„Ÿå…´è¶£å¯ä»¥åœ¨é¡¹ç›®åŸºç¡€ä¸Šåšå…¶ä»–åˆ†æžã€‚
 
-TempData Ä¿Â¼ÖÐÎªÒ»Ð©²âÊÔÊý¾Ý(Ã¿¸ö½âËµµÄÇ°20Ò³·ÛË¿)£¬
+## ä½¿ç”¨ ##
 
-## ÒÀÀµ¿â ##
+1. ä»Žä¼˜é…·æ›´æ–°ç²‰ä¸idä¿¡æ¯->TempData: `python FollowerIDParser.py`
+2. ç”ŸæˆæŠ¥å‘Šå›¾åƒ->TempImg: `python FollowerRelevancyAnalysis.py`
+
+python versionï¼š 2.7
+
+## ä¾èµ–åº“(ç”»å›¾) ##
 
 + [NumPy](http://www.numpy.org/)
 + [matplotlib](http://matplotlib.org/)
++ [NetworkX](http://networkx.github.io/)
 
-## ²âÊÔ·½·¨ ##
-
-`python FollowerRelevancyAnalysis.py`
-
-Êä³ö½á¹ûÀàËÆ:
-
-    2009 followers: 630
-        ->             Pis         73 19.89%
-        ->         QingShu         51 13.90%
-        ->      LaoShu_SJQ         35 9.54%
-        ->        XiaoGuai         31 8.45%
-        ->            Nada         28 7.63%
-        ->           NiuWa         25 6.81%
-        ->             820         19 5.18%
-        ->          HaiTao         19 5.18%
-        ->         XiaoMan         18 4.90%
-        ->      Ks_ChenBin         17 4.63%
-        ->     TuFu_AChuan         13 3.54%
-        ->     Pc_LengLeng         11 3.00%
-        ->  ManLouShuiPing         10 2.72%
-        ->     MeiXi_Huang         10 2.72%
-        ->           Kevin          6 1.63%
-        ->        KuangShi          1 0.27%
+æˆ‘çš„é‚®ç®±ï¼šchinajiezhang@gmail.com
